@@ -2,11 +2,11 @@
 journey/
 
 # Dependancies
-node_modules/
-package-lock.json
+backend/node_modules/
+backend/package-lock.json
 
 # Environment Variables
-.env
+backend/.env
 
 # OS files
 .DS_Store
