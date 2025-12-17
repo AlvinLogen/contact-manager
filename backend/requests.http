@@ -1,0 +1,66 @@
+### Variables
+@baseUrl = http://localhost:3000/api
+@contentType = application/json
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Debug router
+GET {{baseUrl}}/debug
+
+### Get all contacts
+GET {{baseUrl}}/contacts
+
+### Get contact by ID
+GET {{baseUrl}}/contacts/1
+
+### Get non-existent contact
+GET {{baseUrl}}/contacts/999
+
+### Create a new contact
+POST {{baseUrl}}/contacts
+Content-Type: {{contentType}}
+
+{
+    "firstName": "Sarah",
+    "lastName": "Conner",
+    "email": "sarah.conner@example.com",
+    "phone": "+1-555-0199"
+}
+
+### Create a contact with missing data
+POST  {{baseUrl}}/contacts
+Content-Type: {{contentType}}
+
+{
+    "firstName": "Test"
+}
+
+### Create a duplicate email
+POST {{baseUrl}}/contacts
+Content-Type: {{contentType}}
+
+{
+    "firstName": "John",
+    "lastName": "Duplicate",
+    "email": "john.doe@example.com",
+    "phone": "+1-555-0200"
+}
+
+### Update a contact
+PUT {{baseUrl}}/contacts/1
+Content-Type: {{contentType}}
+
+{
+    "firstName": "John",
+    "lastName": "Doe Updated",
+    "email": "john.doe@example.com",
+    "phone": "+1-555-0101"
+}
+
+### Delete a contact
+DELETE {{baseUrl}}/contacts/6
+
+### Delete non-existant contact
+DELETE  {{baseUrl}}/contacts/999
+
