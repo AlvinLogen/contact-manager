@@ -68,11 +68,9 @@ body {
 }
 
 .header-content {
-    display: flex !important;
-    flex-direction: row;
-    align-items: center !important;
-    gap: var(--spacing-md) !important;
-    max-width: 1200px;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
     margin: 0 auto;
     padding: 0 var(--spacing-md);
 }
