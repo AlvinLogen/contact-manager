@@ -1,0 +1,177 @@
+.logo-wrapper {
+    position: relative;
+}
+
+.logo-small {
+    top: 10px;
+    margin-bottom: 10px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.logo-small:hover {
+    transform: scale(1.1) rotate(5deg);
+}
+
+.logo-large {
+    width: 120px;
+    height: 120px;
+}
+
+.c-shape {
+    width: 100%;
+    height: 100%;
+    border: 20px solid;
+    border-right: none;
+    border-radius: 50%;
+    border-color: #fff;
+    position: relative;
+    animation: rainbow 3s linear infinite, float 3s ease-in-out infinite;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.3));
+}
+
+.logo-small .c-shape {
+    top: 10px;
+    border-width: 8px;
+}
+
+.sparkle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: twinkle 2s ease-in-out infinite;
+}
+
+.sparkle:nth-child(1){
+    top: 20%;
+    left: 30%;
+    animation-delay: 0s;
+}
+
+.sparkle:nth-child(2){
+    top: 60%;
+    left: 40%;
+    animation-delay: 0.5s;
+}
+
+.sparkle:nth-child(3){
+    top: 40%;
+    left: 20%;
+    animation-delay: 1s;
+}
+
+.contact-dot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+    border-radius: 50%;
+    animation: orbit 4s linear infinite;
+}
+
+.logo-small .contact-dot {
+    width: 6px;
+    height: 6px;
+}
+
+.contact-dot:nth-child(4){
+    animation-delay: 0s;
+}
+
+.contact-dot:nth-child(5){
+    animation-delay: -1s;
+}
+
+.contact-dot:nth-child(6){
+    animation-delay: -2s;
+}
+
+ .contact-dot:nth-child(7){
+    animation-delay: -3s;
+}
+
+
+@keyframes rainbow {
+    0%, 100% { border-color: #ff6b6b; }
+    14% { border-color: #ffd93d; }
+    28% { border-color: #6bcf7f; }
+    42% { border-color: #4ecdc4; }
+    57% { border-color: #5691c8; }
+    71% { border-color: #9b59b6; }
+    85% { border-color: #ff6b9d; }
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg);}
+    50% {transform: translateY(-10px) rotate(5deg);}
+}
+
+@keyframes twinkle {
+    0%, 100% {opacity: 0.3s; transform: scale(0.8);}
+    50% { opacity: 1; transform: scale(1.2);}
+}
+
+@keyframes orbit {
+    from {
+        transform: rotate(0deg) translateX(35px) rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg) translateX(35px) rotate(-360deg);
+    }
+}
+
+.logo-small .contact-dot {
+    animation: orbit-small 4s linear infinite;
+}
+
+@keyframes orbit-small {
+    from {
+        transform: rotate(0deg) translateX(25px) rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg) translateX(25px) rotate(-360deg);
+    }
+}
+
+/* Splash Screen Overlay*/
+.splash-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    animation: fadeOut 0.5s ease-out 4.5s forwards;
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
+}
+
+.splash-tagline {
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 300;
+    letter-spacing: 3px;
+    margin-top: 60px;
+    opacity: 0;
+    text-transform: uppercase;
+    animation: fadeIn 1s ease-in 0.5s forwards;
+}
+
+@keyframes fadeIn {
+    to { opacity: 0.9;}
+}

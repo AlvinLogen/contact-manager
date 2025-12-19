@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Simple contact management application">
+    <title>Contact Manager</title>
+    <link rel="stylesheet" href="logo-component.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!--Splash screen-->
+    <div class="splash-screen" id="splashScreen">
+        <div class="logo-wrapper logo-large">
+            <div class="c-shape">
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="sparkle"></div>
+                <div class="contact-dot"></div>
+                <div class="contact-dot"></div>
+                <div class="contact-dot"></div>
+                <div class="contact-dot"></div>
+            </div>
+        </div>
+        <div class="splash-tagline">Contact Manager</div>
+    </div>
+
+    <!--Header Section-->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-logo">
+                <div class="logo-wrapper logo-small">
+                    <div class="c-shape">
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                        <div class="sparkle"></div>
+                        <div class="contact-dot"></div>
+                        <div class="contact-dot"></div>
+                        <div class="contact-dot"></div>
+                        <div class="contact-dot"></div>
+                    </div>
+                </div>
+                <div class="header-text">
+                    <h1>Contact Manager</h1>
+                    <p>Manager Your Contacts Efficiently</p>
+                </div>
+            </div>
+
+    </header>
+    <!--Main Section-->
+    <main class="main-content">
+        <div class="container">
+            <section class="form-section">
+                <h2>Add New Contact</h2>
+                <form id="contactForm" class="contact-form">
+                    <div class="form-group">
+                        <label for="firstName">First Name *</label>
+                        <input 
+                            type="text"
+                            id="firstName"
+                            name="firstName"
+                            required
+                            placeholder="Enter First Name"
+                            autocomplete="given-name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="lastName">Last Name *</label>
+                        <input 
+                            type="text"
+                            id="lastName"
+                            name="lastName"
+                            required
+                            placeholder="Enter Last Name"
+                            autocomplete="family-name"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email *</label>
+                        <input
+                            type="email"
+                            id="email"
+                            name="email"
+                            required
+                            placeholder="Enter Email Address"
+                            autocomplete="email"
+                        >
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone</label>
+                        <input
+                            type="tel"
+                            id="phone"
+                            name="phone"
+                            placeholder="Enter Phone Number"
+                            autocomplete="tel"
+                        >
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span id="submitBtnText">Add Contact</span>
+                        </button>
+                        <button type="button" id="cancelBtn" class="btn btn-secondary" style="display: none;">
+                            Cancel
+                        </button>
+                    </div>
+
+                    <!--Hidden field for edit mode-->
+                    <input type="hidden" id="editId" value="">
+                </form>
+
+                <!--Status Message-->
+                <div id="statusMessage" class="status-message" style="display: none;"></div>
+            </section>
+
+            <section class="contacts-section">
+                <div class="section-header">
+                    <h2>All Contacts</h2>
+                    <div id="contactCount" class="contact-count">0 contacts</div>
+                </div>
+
+                <!--Loading indicator-->
+                <div id="loadingIndicator" class="loading">
+                    Loading contacts...
+                </div>
+
+                <!--Empty state-->
+                <div id="emptyState" class="empty=state" style="display: none;">
+                    <p>No contacts yet. Add your first contact above!</p>
+                </div>
+
+                <div id="contactsContainer" class="contacts-container" style="display: none;">
+                    <table class="contacts-table">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contactsList">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!--Footer Section-->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2026 Contact Manager | Alvin Logenstein</p>
+        </div>
+    </footer>
+
+    <!--Hide Splash Screen after 3 seconds-->
+    <script>
+        setTimeout(() => {
+            const splash = document.getElementById('splashScreen');
+            splash.style.display = 'none';
+        }, 5000);
+    </script>
+</body>
+
+</html>
