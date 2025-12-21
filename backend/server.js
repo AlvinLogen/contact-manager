@@ -42,13 +42,8 @@ app.use((req, res, next) => {
 // Use routes with /api prefix
 app.use('/api', routes);
 
-// SERVER STARTUP
-// ============================================
-
 // Start Server
 app.listen(PORT, () => {
-    console.log('====================================');
-    console.log(' Contact Manager API Service ');
     console.log('====================================');
     console.log(`Server running on port: ${PORT}`);
     console.log(`Environment: ${process.env.NODE_ENV}`);
