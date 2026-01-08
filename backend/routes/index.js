@@ -159,7 +159,7 @@ async (req, res) => {
 // ======================================
 
 // Debug router
-router.get("/debug", asyncHandler(
+router.get('/debug', asyncHandler(
 async (req, res) => {
   const pool = await getPool();
   const result = await pool.request().query("SELECT DB_NAME() as CurrentDB");

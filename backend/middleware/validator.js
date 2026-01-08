@@ -43,7 +43,7 @@ const validateContact = (req, res, next) => {
     }
 
     if (errors.length > 0) {
-        throw new ValidationError(errors.join(', '));
+        throw new ValidatorError(errors.join(', '));
     }
 
     next();
@@ -51,7 +51,7 @@ const validateContact = (req, res, next) => {
 
 // Validate ID Parameter
 const validateId = (req, res, next) => {
-    const id = parstInt(req.params.id);
+    const id = parseInt(req.params.id);
 
     if(isNaN(id) || id <= 0){
         throw new ValidatorError('Invalid contact Id');

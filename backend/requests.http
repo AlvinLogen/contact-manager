@@ -25,7 +25,7 @@ Content-Type: {{contentType}}
     "firstName": "Sarah",
     "lastName": "Conner",
     "email": "sarah.conner@example.com",
-    "phone": "+1-555-0199"
+    "phone": "555-012-0199"
 }
 
 ### Create a contact with missing data
