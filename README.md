@@ -2,6 +2,8 @@
 
 A full-stack contact management application built with Node.js, Express, and SQL Server.
 
+Home Page: http://contactmanager.corp.logenix.com/
+
 ## 🚀 Features
 
 - ✅ Create, Read, Update, Delete contacts
