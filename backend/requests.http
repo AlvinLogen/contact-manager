@@ -22,9 +22,9 @@ POST {{baseUrl}}/contacts
 Content-Type: {{contentType}}
 
 {
-    "firstName": "Sarah",
-    "lastName": "Conner",
-    "email": "sarah.conner@example.com",
+    "firstName": "Alvin",
+    "lastName": "Logenstein",
+    "email": "a.conner@example.com",
     "phone": "555-012-0199"
 }
 
