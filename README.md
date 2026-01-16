@@ -1,39 +1,63 @@
 # Contact Manager Application
 
-A full-stack contact management application built with Node.js, Express, and SQL Server.
+A professional full-stack contact management application built with Node.js, Express, and SQL Server, featuring advanced security, testing, and modern JavaScript patterns.
 
 Home Page: http://contactmanager.corp.logenix.com/
 
 ## 🚀 Features
 
-- ✅ Create, Read, Update, Delete contacts
-- ✅ Form validation (client and server-side)
-- ✅ Responsive design
-- ✅ RESTful API architecture
-- ✅ SQL Server database with proper indexing
-- ✅ Clean code following best practices
+### Core Functionality
+- ✅ Full CRUD operations (Create, Read, Update, Delete)
+- ✅ Search functionality with real-time filtering
+- ✅ Pagination support for large datasets
+- ✅ Responsive modal-based UI
+- ✅ Real-time notifications
+
+### Architecture
+- ✅ RESTful API with proper status codes
+- ✅ Module Pattern with separation of concerns
+- ✅ Centralized error handling
+- ✅ Async/await throughout
+- ✅ SQL Server with optimized indexing
+
+### Security
+- ✅ Helmet.js for HTTP security headers
+- ✅ Rate limiting (general + write-specific)
+- ✅ Content Security Policy (CSP)
+- ✅ SQL injection prevention (parameterized queries)
+- ✅ XSS protection (HTML escaping)
+- ✅ Input sanitization and validation
+- ✅ Environment variable protection
+
+### Testing
+- ✅ Jest test framework configured
+- ✅ API endpoint testing
+- ✅ Validation middleware testing
+- ✅ Code coverage reporting
 
 ## Prerequisites
 
-- Node.js (v14 or higher)
+- Node.js (v18 or higher)
 - SQL Server (2016 or higher)
+- npm or yarn package manager
 - Git
 
 ## Installation
 
 ### 1. Clone the repository
 \`\`\`bash
-git clone <your-repo-url>
-cd contact_manage_app
+git clone https://github.com/AlvinLogen/contact-manager.git
+cd contact_manager_app
 \`\`\`
 
-### 2. Install dependencies
+### 2. Install backend dependencies
 \`\`\`bash
+cd backend
 npm install
 \`\`\`
 
 ### 3. Configure environment variables
-Create a \`.env\` file in the root directory:
+Create a \`.env\` file in the \`backend\` directory:
 \`\`\`env
 DB_SERVER=localhost
 DB_DATABASE=ContactDB
@@ -60,6 +84,12 @@ npm run dev
 
 # Production mode
 npm start
+
+# Run tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
 \`\`\`
 
 ### 6. Access the application
@@ -89,9 +119,6 @@ contact_manager_app/
 │       ├── index.html         # Frontend HTML
 │       ├── style.css          # Styles
 │       └── app.js             # Frontend JavaScript
-├── journey/
-│   ├── development_journey.txt
-│   └── sprint_3_plan.md
 ├── .gitignore                 # Git ignore rules
 └── README.md                  # This file
 \`\`\`
@@ -103,10 +130,15 @@ contact_manager_app/
 
 ### Contacts
 - **GET** `/api/contacts` - Get all contacts
+  - Query params: `?search=term&page=1&limit=10`
 - **GET** `/api/contacts/:id` - Get contact by ID
-- **POST** `/api/contacts` - Create new contact
-- **PUT** `/api/contacts/:id` - Update contact
-- **DELETE** `/api/contacts/:id` - Delete contact
+- **POST** `/api/contacts` - Create new contact (rate limited: 50/15min)
+- **PUT** `/api/contacts/:id` - Update contact (rate limited: 50/15min)
+- **DELETE** `/api/contacts/:id` - Delete contact (rate limited: 50/15min)
+
+### Rate Limits
+- General API: 100 requests per 15 minutes
+- Write operations (POST/PUT/DELETE): 50 requests per 15 minutes
 
 ### Example API Request
 \`\`\`bash
@@ -122,29 +154,71 @@ curl -X POST http://localhost:3000/api/contacts \
 
 ## Testing
 
+### Automated Tests
+```bash
+cd backend
+
+# Run all tests
+npm test
+
+# Run with coverage
+npm run test:coverage
+
+# Watch mode
+npm run test:watch
+```
+
+**Test Coverage:**
+- API endpoint tests (GET, POST, PUT, DELETE)
+- Validation middleware tests
+- Error handling tests
+
 ### Manual Testing
-1. Use the provided \`requests.http\` file with VS Code REST Client extension
+1. Use the provided `requests.http` file with VS Code REST Client extension
 2. Or use Postman/Insomnia with the endpoints above
 
 ### Browser Testing
 1. Navigate to http://localhost:3000
-2. Test all CRUD operations through the UI
+2. Test CRUD operations, search, and pagination through the UI
 
 ## Technologies Used
 
-- **Backend:** Node.js, Express.js
-- **Database:** Microsoft SQL Server, T-SQL
-- **Frontend:** HTML5, CSS3, Vanilla JavaScript
-- **Dev Tools:** nodemon, REST Client
-- **Version Control:** Git, GitHub
+### Backend
+- **Runtime:** Node.js v23.x
+- **Framework:** Express.js v4.x
+- **Database:** Microsoft SQL Server (mssql driver)
+- **Security:** Helmet.js, express-rate-limit
+- **Testing:** Jest v29.x
+- **Process Manager:** PM2
+
+### Frontend
+- **Core:** HTML5, CSS3, Vanilla JavaScript
+- **Pattern:** Module Pattern (IIFE)
+- **Architecture:** Separation of concerns (API layer + Business logic)
+
+### Dev Tools
+- nodemon, REST Client, Git/GitHub
 
 ## Security Features
 
-- SQL injection prevention (parameterized queries)
-- Input validation (client and server-side)
-- XSS protection (HTML escaping)
-- Environment variable protection
-- CORS configuration
+### HTTP Security
+- **Helmet.js** - Security headers (CSP, X-Frame-Options, etc.)
+- **Rate Limiting** - Prevents brute force attacks
+  - General: 100 requests/15min
+  - Write ops: 50 requests/15min
+- **CORS** - Cross-origin resource sharing configured
+
+### Input Security
+- **SQL Injection Prevention** - Parameterized queries
+- **XSS Protection** - HTML escaping on output
+- **Input Validation** - Server-side validation middleware
+- **Data Sanitization** - Trim and normalize inputs
+
+### Best Practices
+- Environment variables for sensitive data
+- Graceful shutdown handling
+- Centralized error handling
+- No sensitive data in logs
 
 ## Deployment Options
 
