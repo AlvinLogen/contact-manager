@@ -1,3 +1,5 @@
+const logger = require("../utils/logger");
+
 class AppError extends Error {
     constructor(message, statusCode){
         super(message);
@@ -29,12 +31,13 @@ class DatabaseError extends AppError {
 }
 
 const errorHandler = (err, req, res, next) => {
-    console.error('Error:', {
+    logger.error('Error:', {
         name: err.name, 
         message: err.message,
-        stack: process.env.NODE_ENV === 'development' ? err.stack: undefined,
+        stack: err.stack,
         url: req.originalUrl,
-        method: req.method
+        method: req.method,
+        ip: req.ip
     });
 
     if(err.isOperational){

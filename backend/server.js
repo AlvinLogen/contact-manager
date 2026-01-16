@@ -5,8 +5,6 @@ const path = require('path');
 require('dotenv').config();
 
 const { errorHandler } = require('./middleware/errorHandler');
-const asyncHandler = require('./middleware/asyncHandler');
-
 const routes = require('./routes/index');
 const { closePool } = require('./config/database');
 
