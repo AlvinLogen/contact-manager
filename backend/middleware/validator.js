@@ -34,11 +34,12 @@ const validateContact = (req, res, next) => {
         }
     }
 
-    // Phone Validation
+    // Phone Validation (optional, but if provided must be valid)
     if (phone && phone.trim() !== '') {
-        const phonePattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/;
-        if (!phonePattern.test(phone)) {
-            errors.push('Invalid phone format');
+        // More flexible phone pattern: allows international formats
+        const phonePattern = /^[\+]?[(]?[0-9]{1,4}[)]?[-\s\.]?[(]?[0-9]{1,4}[)]?[-\s\.]?[0-9]{1,9}$/;
+        if (!phonePattern.test(phone.trim())) {
+            errors.push('Invalid phone format. Please use digits, spaces, dashes, or parentheses.');
         }
     }
 

@@ -128,12 +128,25 @@ const ContactManager = (() => {
     // Public Methods
     function renderContacts() {
         const tbody = document.getElementById('contactsTableBody');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+        const contactsContainer = document.getElementById('contactsContainer');
+        const emptyState = document.getElementById('emptyState');
+        
+        // Hide loading
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+        
         tbody.innerHTML = '';
 
         if (contacts.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No contacts found</td></tr>';
+            contactsContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No contacts found</td></tr>';
             return;
         }
+        
+        // Show contacts table
+        contactsContainer.style.display = 'block';
+        emptyState.style.display = 'none';
 
         contacts.forEach(contact => {
             const row = tbody.insertRow();
@@ -143,8 +156,8 @@ const ContactManager = (() => {
                 <td>${escapeHTML(contact.Email)}</td>
                 <td>${contact.Phone ? escapeHTML(contact.Phone) : '-'}</td>
                 <td>
-                    <button onclick="ContactManager.editContact(${contact.ContactId})" class="btn btn-secondary">Edit</button>
-                    <button onclick="ContactManager.deleteContact(${contact.ContactId})" class="btn btn-secondary">Delete</button>
+                    <button data-action="edit" data-id="${contact.Id}" class="btn btn-secondary">Edit</button>
+                    <button data-action="delete" data-id="${contact.Id}" class="btn btn-secondary">Delete</button>
                 </td>
             `;
         });
@@ -157,8 +170,13 @@ const ContactManager = (() => {
 
         const total = contacts.length;
         const showing = total > 0 ? `Showing ${(( currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, total)} of ${total} contacts` : 'No contacts found';
-
         document.getElementById('paginationInfo').textContent = showing;
+        
+        // Update contact count badge
+        const contactCount = document.getElementById('contactCount');
+        if (contactCount) {
+            contactCount.textContent = `${total} contact${total !== 1 ? 's' : ''}`;
+        }
     }
 
     const loadContacts = async (search = currentSearch, page = currentPage) => {
@@ -174,6 +192,21 @@ const ContactManager = (() => {
 
     // Event handlers
     const setupEventListeners = () => {
+        // Event delegation for edit/delete buttons
+        document.getElementById('contactsTableBody').addEventListener('click', (e) => {
+            const target = e.target;
+            if (target.tagName === 'BUTTON') {
+                const action = target.dataset.action;
+                const id = parseInt(target.dataset.id);
+                
+                if (action === 'edit') {
+                    ContactManager.editContact(id);
+                } else if (action === 'delete') {
+                    ContactManager.deleteContact(id);
+                }
+            }
+        });
+        
         // Search Functions
         document.getElementById('searchBtn').addEventListener('click', () => {
             const searchTerm = document.getElementById('searchInput').value;
@@ -228,24 +261,26 @@ const ContactManager = (() => {
                     showNotification('Contact created successfully', 'success');
                 }
 
-                closeModal();
+                // Reset form
+                document.getElementById('contactForm').reset();
+                document.getElementById('contactId').value = '';
                 loadContacts(currentSearch, currentPage);
 
             } catch (error) {
                 // Error already handled in api methods
             }
         });
-
-        // Modal Close
-        document.querySelector('.close').addEventListener('click', closeModal);
-        document.getElementById('cancelBtn').addEventListener('click', closeModal);
-
-        window.addEventListener('click', (e) => {
-            const modal = document.getElementById('contactModal');
-            if(e.target === modal){
-                closeModal();
-            }
-        });
+        
+        // Cancel button handler
+        const cancelBtn = document.getElementById('cancelBtn');
+        if (cancelBtn) {
+            cancelBtn.addEventListener('click', () => {
+                document.getElementById('contactForm').reset();
+                document.getElementById('contactId').value = '';
+                document.getElementById('submitBtnText').textContent = 'Add Contact';
+                cancelBtn.style.display = 'none';
+            });
+        }
     };
 
     function escapeHTML(text) {
@@ -260,26 +295,11 @@ const ContactManager = (() => {
         return text.replace(/[&<>"']/g, m => map[m]);
     };
 
-    const openModal = (title) => {
-        document.getElementById('modalTitle').textContent = title;
-        document.getElementById('contactModal').style.display = 'block';
-    };
-
-    const closeModal = () => {
-        document.getElementById('contactModal').style.display = 'none';
-        document.getElementById('contactForm').reset();
-        document.getElementById('contactId').value = '';
-    };
-
     // Public Interface
     return {
         init: async () => {
             await loadContacts();
             setupEventListeners();
-        },
-
-        addContact: () => {
-            openModal('Add New Contact');
         },
 
         editContact: async (id) => {
@@ -288,12 +308,21 @@ const ContactManager = (() => {
 
                 if (result && result.success){
                     const contact = result.data;
-                    document.getElementById('contactId').value = contact.ContactID;
+                    document.getElementById('contactId').value = contact.Id;
                     document.getElementById('firstName').value = contact.FirstName;
                     document.getElementById('lastName').value = contact.LastName;
                     document.getElementById('email').value = contact.Email;
                     document.getElementById('phone').value = contact.Phone || '';
-                    openModal('Edit Contact');
+                    
+                    // Update UI for edit mode
+                    document.getElementById('submitBtnText').textContent = 'Update Contact';
+                    const cancelBtn = document.getElementById('cancelBtn');
+                    if (cancelBtn) {
+                        cancelBtn.style.display = 'inline-block';
+                    }
+                    
+                    // Scroll to form
+                    document.getElementById('contactForm').scrollIntoView({ behavior: 'smooth' });
                 }
 
             } catch (error) {

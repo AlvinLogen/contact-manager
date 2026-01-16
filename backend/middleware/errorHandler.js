@@ -48,6 +48,14 @@ const errorHandler = (err, req, res, next) => {
     }
 
     if (err.name === 'RequestError' || err.number){
+        // Handle duplicate key constraint violation
+        if (err.number === 2627 || err.number === 2601) {
+            return res.status(409).json({
+                success: false,
+                error: 'A contact with this email already exists'
+            });
+        }
+        
         return res.status(500).json({
             success: false, 
             error: 'Database operation failed',

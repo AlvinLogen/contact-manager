@@ -27,17 +27,45 @@ router.get("/health", (req, res) => {
 router.get(
   "/contacts",
   asyncHandler(async (req, res) => {
+    const { search, page = 1, limit = 10 } = req.query;
+    const offset = (page - 1) * limit;
+    
     const pool = await getPool();
-    const result = await pool.request().query(`
-        SELECT *
-        FROM Contacts
-        ORDER BY LastName, FirstName
-    `);
+    let query = 'SELECT * FROM Contacts';
+    const request = pool.request();
+    
+    if (search) {
+        query += ` WHERE FirstName LIKE @search OR LastName LIKE @search OR Email LIKE @search`;
+        request.input('search', sql.NVarChar, `%${search}%`);
+    }
+    
+    query += ` ORDER BY LastName, FirstName OFFSET @offset ROWS FETCH NEXT @limit ROWS ONLY`;
+    request.input('offset', sql.Int, parseInt(offset));
+    request.input('limit', sql.Int, parseInt(limit));
+    
+    const result = await request.query(query);
+    
+    // Get total count
+    let countQuery = 'SELECT COUNT(*) as total FROM Contacts';
+    const countRequest = pool.request();
+    
+    if (search) {
+        countQuery += ` WHERE FirstName LIKE @search OR LastName LIKE @search OR Email LIKE @search`;
+        countRequest.input('search', sql.NVarChar, `%${search}%`);
+    }
+    
+    const countResult = await countRequest.query(countQuery);
+    const total = countResult.recordset[0].total;
 
     res.status(200).json({
       success: true,
       data: result.recordset,
-      count: result.recordset.length,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total: total,
+        pages: Math.ceil(total / limit)
+      }
     });
   })
 );
