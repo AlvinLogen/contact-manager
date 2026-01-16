@@ -16,12 +16,14 @@ const config = {
     options: {
         encrypt: process.env.DB_ENCRYPT === 'true',
         trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE === 'true',
+        enableAirthAbort: true
     },
     pool: {
         max: 10,
         min: 0,
         idleTimeoutMillis: 30000
-    }
+    }, 
+    requestTimeout: 30000
 };
 
 // Connection pool (singleton pattern)

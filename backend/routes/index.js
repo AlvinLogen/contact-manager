@@ -1,10 +1,18 @@
 const express = require("express");
 const router = express.Router();
 const sql = require("mssql");
+const rateLimit = require('express-rate-limit');
 
 const { getPool } = require("../config/database");
 const asyncHandler = require("../middleware/asyncHandler");
 const { validateContact, validateId } = require("../middleware/validator");
+
+const writeLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    max: 50,
+    message: 'Too many write requests from this IP, please try again later'  
+});
+
 
 // Health check endpoint
 router.get("/health", (req, res) => {
@@ -66,7 +74,7 @@ router.get(
 );
 
 // Create a new contact
-router.post("/contacts", validateContact, asyncHandler(
+router.post("/contacts", writeLimiter, validateContact, asyncHandler(
     async (req, res) => {
     const { firstName, lastName, email, phone } = req.body;
     const pool = await getPool();
@@ -92,7 +100,7 @@ router.post("/contacts", validateContact, asyncHandler(
 }));
 
 // Update an existing contact
-router.put("/contacts/:id", validateId, validateContact, asyncHandler(
+router.put("/contacts/:id", writeLimiter, validateId, validateContact, asyncHandler(
  async (req, res) => {
     const { firstName, lastName, email, phone } = req.body;
 
@@ -132,7 +140,7 @@ router.put("/contacts/:id", validateId, validateContact, asyncHandler(
 }));
 
 // Delete a contact
-router.delete("/contacts/:id", validateId, asyncHandler(
+router.delete("/contacts/:id", writeLimiter, validateId, asyncHandler(
 async (req, res) => {
     const pool = await getPool();
     const result = await pool.request().input('id', sql.Int, req.params.id).query(`
