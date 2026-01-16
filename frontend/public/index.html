@@ -51,6 +51,13 @@
             </div>
 
     </header>
+    <!--Search Container -->
+    <div class="search-container">
+        <input type="text" id="searchInput" placeholder="Search contacts by name or email..." class="search-input">
+        <button id="searchBtn" class="btn btn-secondary">Search</button>
+        <button id="clearSearchBtn" class="btn btn-secondary">Clear</button>
+    </div>
+
     <!--Main Section-->
     <main class="main-content">
         <div class="container">
@@ -59,49 +66,25 @@
                 <form id="contactForm" class="contact-form">
                     <div class="form-group">
                         <label for="firstName">First Name *</label>
-                        <input 
-                            type="text"
-                            id="firstName"
-                            name="firstName"
-                            required
-                            placeholder="Enter First Name"
-                            autocomplete="given-name"
-                        >
+                        <input type="text" id="firstName" name="firstName" required placeholder="Enter First Name"
+                            autocomplete="given-name">
                     </div>
 
                     <div class="form-group">
                         <label for="lastName">Last Name *</label>
-                        <input 
-                            type="text"
-                            id="lastName"
-                            name="lastName"
-                            required
-                            placeholder="Enter Last Name"
-                            autocomplete="family-name"
-                        >
+                        <input type="text" id="lastName" name="lastName" required placeholder="Enter Last Name"
+                            autocomplete="family-name">
                     </div>
 
                     <div class="form-group">
                         <label for="email">Email *</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            required
-                            placeholder="Enter Email Address"
-                            autocomplete="email"
-                        >
+                        <input type="email" id="email" name="email" required placeholder="Enter Email Address"
+                            autocomplete="email">
                     </div>
 
                     <div class="form-group">
                         <label for="phone">Phone</label>
-                        <input
-                            type="tel"
-                            id="phone"
-                            name="phone"
-                            placeholder="Enter Phone Number"
-                            autocomplete="tel"
-                        >
+                        <input type="tel" id="phone" name="phone" placeholder="Enter Phone Number" autocomplete="tel">
                     </div>
 
                     <div class="form-actions">
@@ -151,6 +134,18 @@
                         </tbody>
                     </table>
                 </div>
+
+                <div class="pagination-container">
+                    <div class="pagination-info">
+                        <span id="paginationInfo">Showing 0 contacts</span>
+                    </div>
+                    <div class="pagination-controls">
+                        <button id="prevPageBtn" class="btn btn-secondary" disabled>Previous</button>
+                        <span id="pageInfo">Page 1 of 1</span>
+                        <button id="nextPageBtn" class="btn btn-secondary">Next</button>
+                    </div>
+                </div>
+
             </section>
         </div>
     </main>

@@ -2,26 +2,10 @@ const ContactManager = (() => {
     // Private Variables
     const API_BASE_URL = '/api';
     let contacts = [];
-    let isEditMode = null;
     let currentPage = 1;
+    let totalPages = 1;
+    let currentSearch = '';
     const pageSize = 10;
-
-    const contactForm = document.getElementById('contactForm');
-    const firstNameInput = document.getElementById('firstName');
-    const lastNameInput = document.getElementById('lastName');
-    const emailInput = document.getElementById('email');
-    const phoneInput = document.getElementById('phone');
-    const editIdInput = document.getElementById('editId');
-    const submitBtnText = document.getElementById('submitBtnText');
-    const cancelBtn = document.getElementById('cancelBtn');
-
-    // Display Elements
-    const contactsList = document.getElementById('contactsList');
-    const contactCount = document.getElementById('contactCount');
-    const statusMessage = document.getElementById('statusMessage');
-    const loadingIndicator = document.getElementById('loadingIndicator');
-    const emptyState = document.getElementById('emptyState');
-    const contactsContainer = document.getElementById('contactsContainer');
 
     // Private Methods
     const handleError = (error, context) => {
@@ -29,6 +13,7 @@ const ContactManager = (() => {
         showNotification(`Error ${error.message || 'Something went wrong.'}`, 'error');
     };
 
+    // Notification System
     const showNotification = (message, type = 'info') => {
         const notification = document.createElement('div');
         notification.className = `notification notification-${type}`;
@@ -40,23 +25,35 @@ const ContactManager = (() => {
             setTimeout(() => {
                 notification.remove()
             }, 300);
-        },3000);
+        }, 3000);
     };
 
     // API Methods
     const api = {
-        async getAll() {
+        async getContacts(search = '', page = 1) {
             try {
-                const response = await fetch(`${API_BASE_URL}/contacts`);
+                const params = new URLSearchParams({
+                    page: page,
+                    limit: pageSize
+                });
+
+                if (search) {
+                    params.append('search', search);
+                }
+
+                const response = await fetch(`${API_BASE_URL}/contacts?${params}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+
+                const result = await response.json();
+                return result;
+
             } catch (error) {
                 handleError(error, 'fetching contacts');
-                return null;
+                return { data: [], pagination: { page: 1, pages: 1, total: 0 } };
             }
         },
 
-        async getById(id){
+        async getById(id) {
             try {
                 const response = await fetch(`${API_BASE_URL}/contacts/${id}`);
                 if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -67,7 +64,7 @@ const ContactManager = (() => {
             }
         },
 
-        async create(contactData) {
+        async createContact(contactData) {
             try {
                 const response = await fetch(`${API_BASE_URL}/contacts`, {
                     method: 'POST',
@@ -76,15 +73,19 @@ const ContactManager = (() => {
                     },
                     body: JSON.stringify(contactData)
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Failed to create contact');
+
+                return result;
+
             } catch (error) {
                 handleError(error, 'creating contact');
                 throw error;
             }
         },
 
-        async update(id, contactData) {
+        async updateContact(id, contactData) {
             try {
                 const response = await fetch(`${API_BASE_URL}/contacts/${id}`, {
                     method: 'PUT',
@@ -93,21 +94,30 @@ const ContactManager = (() => {
                     },
                     body: JSON.stringify(contactData)
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
-                return await response.json();
+
+                const result = await response.json();
+                if (!response.ok) throw new Error(result.error || 'Failed to update contact');
+
+                return result;
+
             } catch (error) {
                 handleError(error, 'updating contact');
                 throw error;
             }
         },
 
-        async delete(id) {
+        async deleteContact(id) {
             try {
                 const response = await fetch(`${API_BASE_URL}/contacts/${id}`, {
                     method: 'DELETE'
                 });
-                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+                const result = await response.json();
+
+                if (!response.ok) throw new Error(result.error || 'Failed to delete contact');
+
                 return true;
+
             } catch (error) {
                 handleError(error, 'deleting contact');
                 throw error;
@@ -116,248 +126,150 @@ const ContactManager = (() => {
     };
 
     // Public Methods
-    async function loadContacts() {
-        try {
-            showLoading();
-
-            const response = await fetch(`${API_BASE_URL}/contacts`);
-            const data = await response.json();
-
-            if(!data.success){
-                throw new Error(data.error || 'Failed to load contacts');
-            }
-
-            contacts = data.data;
-            renderContacts();
-            updateContactCount();
-
-        } catch (error) {
-            console.error('Error loading contacts:', error);
-            showStatusMessage('Failed to load contacts. Please refresh the page.', error);
-        } finally {
-            showLoading(false);
-        }
-    };
-
-    async function createContact(contactData) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/contacts`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(contactData)
-            });
-
-            const data = await response.json();
-
-            if(!data.success){
-                throw new Error(data.error || 'Failed to create contact');
-            }
-
-            showStatusMessage('Contact added successfully!', 'success');
-            loadContacts();
-            resetForm();
-
-        } catch (error) {
-            console.error('Error creating contact:', error);
-            showStatusMessage(error.message, 'error');
-        }
-    };
-
-    function editContact(id){
-        const contact = contacts.find(c => c.Id === id);
-        if(!contact) return;
-
-        firstNameInput.value = contact.FirstName;
-        lastNameInput.value = contact.LastName;
-        emailInput.value = contact.Email;
-        phoneInput.value = contact.Phone || '';
-        editIdInput.value = contact.Id;
-
-        isEditMode = true;
-        submitBtnText.textContent = 'Update Contact';
-        cancelBtn.style.display = 'inline-block';
-
-        contactForm.scrollIntoView({ behavior: 'smooth'});
-
-        firstNameInput.focus();
-    };
-
-    async function updateContact(id, contactData) {
-        try {
-            const response = await fetch(`${API_BASE_URL}/contacts/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(contactData)
-            });
-
-            const data = await response.json();
-
-            if(!data.success){
-                throw new Error(data.error || 'Failed to update contact');
-            }
-
-            showStatusMessage('Contact updated successfully', 'success');
-            loadContacts();
-            resetForm();
-        } catch (error) {
-            console.error('Error updating contact', error);
-            showStatusMessage(error.message, 'error');
-        }
-    };
-
-
-    async function deleteContact(id) {
-        const contact = contacts.find(c => c.Id === id);
-        if(!contact) return;
-
-        const confirmMessage = `Are you sure you want to delete ${contact.FirstName} ${contact.LastName}?`;
-        if(!confirm(confirmMessage)) return;
-
-        try {
-            const response = await fetch(`${API_BASE_URL}/contacts/${id}`, {
-                method: 'DELETE'
-            });
-
-            const data = await response.json();
-
-            if(!data.success){
-                throw new Error(data.error || 'Failed to delete contact');
-            }
-
-            showStatusMessage('Contact delete successfully', 'success');
-            loadContacts();
-
-        } catch (error) {
-            console.error('Error deleting contact', error);
-            showStatusMessage(error.message, 'error')
-        }
-    };
-
     function renderContacts() {
-        contactsList.innerHTML = '';
-        if (contacts.length === 0){
-            emptyState.style.display = 'block';
-            contactsContainer.style.display = 'none';
+        const tbody = document.getElementById('contactsTableBody');
+        tbody.innerHTML = '';
+
+        if (contacts.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">No contacts found</td></tr>';
             return;
         }
 
-        emptyState.style.display = 'none';
-        contactsContainer.style.display = 'block';
-
         contacts.forEach(contact => {
-            const row = createContactRow(contact);
-            contactsList.appendChild(row);
+            const row = tbody.insertRow();
+            row.innerHTML = `
+                <td>${escapeHTML(contact.FirstName)}</td>
+                <td>${escapeHTML(contact.LastName)}</td>
+                <td>${escapeHTML(contact.Email)}</td>
+                <td>${contact.Phone ? escapeHTML(contact.Phone) : '-'}</td>
+                <td>
+                    <button onclick="ContactManager.editContact(${contact.ContactId})" class="btn btn-secondary">Edit</button>
+                    <button onclick="ContactManager.deleteContact(${contact.ContactId})" class="btn btn-secondary">Delete</button>
+                </td>
+            `;
         });
     };
 
-    function createContactRow(contact){
-        const row = document.createElement('tr');
+    const updatePaginationUI = () => {
+        document.getElementById('pageInfo').textContent = `Page ${currentPage} of ${totalPages}`;
+        document.getElementById('prevPageBtn').disabled = currentPage === 1;
+        document.getElementById('nextPageBtn').disabled = currentPage === totalPages;
 
-        row.innerHTML = `
-            <td>
-                <div class="contact-name">
-                    ${escapeHTML(contact.FirstName)} ${escapeHTML(contact.LastName)}
-                </div>
-            </td>
-            <td>${escapeHTML(contact.Email)}</td>
-            <td>${contact.Phone ? escapeHTML(contact.Phone) : '-'}</td>
-            <td class="contact-actions">
-                <button
-                    class="btn btn-sm btn-edit"
-                    onclick="ContactManager.editContact(${contact.Id})"
-                    aria-label="Edit ${escapeHTML(contact.Firstname)} ${escapeHTML(contact.LastName)}"
-                >Edit
-                </button>
-                <button 
-                    class="btn btn-sm btn-delete"
-                    onclick="ContactManager.deleteContact(${contact.Id})"
-                    aria-label="Delete ${escapeHTML(contact.Firstname)} ${escapeHTML(contact.LastName)}"
-                >Delete
-                </button>
-            </td>
-        `;
+        const total = contacts.length;
+        const showing = total > 0 ? `Showing ${(( currentPage - 1) * pageSize) + 1}-${Math.min(currentPage * pageSize, total)} of ${total} contacts` : 'No contacts found';
 
-        return row;
+        document.getElementById('paginationInfo').textContent = showing;
+    }
+
+    const loadContacts = async (search = currentSearch, page = currentPage) => {
+        const result = await api.getContacts(search, page);
+        contacts = result.data || [];
+        currentPage = result.pagination?.page || 1;
+        totalPages = result.pagination?.pages || 1;
+        currentSearch = search;
+
+        renderContacts();
+        updatePaginationUI();
     };
 
-    function updateContactCount(){
-        const count = contacts.length;
-        contactCount.textContent = `${count} contact${count !== 1 ? 's' : ''}`;
-    }
+    // Event handlers
+    const setupEventListeners = () => {
+        // Search Functions
+        document.getElementById('searchBtn').addEventListener('click', () => {
+            const searchTerm = document.getElementById('searchInput').value;
+            currentPage = 1;
+            loadContacts(searchTerm, 1);
+        });
 
-    function showLoading(show){
-        loadingIndicator.style.display = show ? 'block' : 'none';
-    }
+        document.getElementById('clearSearchBtn').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
+            currentPage = 1;
+            loadContacts('', 1);
+        });
 
-    function showStatusMessage(message, type){
-        statusMessage.textContent = message;
-        statusMessage.className = `status-message ${type}`;
-        statusMessage.style.display = 'block';
-
-        setTimeout(() => {
-            hideStatusMessage();
-        }, 5000);
-    }
-
-    function hideStatusMessage(){
-        statusMessage.style.display = 'none';
-    }
-
-    function escapeHTML(text){
-        const div = document.createElement('div');
-        div.textContent = text;
-        return div.innerHTML;
-    }
-
-    async function handleFormSubmit(event) {
-        event.preventDefault();
-
-        const contactData = {
-            firstName: firstNameInput.value.trim(),
-            lastName: lastNameInput.value.trim(),
-            email: emailInput.value.trim(),
-            phone: phoneInput.value.trim() || null
-        }
-
-        if(!contactData.firstName || !contactData.lastName || !contactData.email){
-            showStatusMessage('Please fill in all required fields', 'error');
-            return;
-        }
-
-        const submitBtn = contactForm.querySelector('button[type="submit"]');
-        submitBtn.disabled = true;
-
-        try {
-            if(isEditMode){
-                const editId = parseInt(editIdInput.value);
-                await updateContact(editId, contactData);
-            } else {
-                await createContact(contactData);
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter'){
+                document.getElementById('searchBtn').click();
             }
-        } finally {
-            submitBtn.disabled = false;
-        }
+        });
+
+        // Pagination Functions
+        document.getElementById('prevPageBtn').addEventListener('click', () => {
+            if(currentPage > 1){
+                loadContacts(currentSearch, currentPage - 1);
+            }
+        });
+
+        document.getElementById('nextPageBtn').addEventListener('click', () => {
+            if (currentPage < totalPages) {
+                loadContacts(currentSearch, currentPage + 1);
+            }
+        });
+
+        // Form Submission
+        document.getElementById('contactForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = {
+                firstName: document.getElementById('firstName').value,
+                lastName: document.getElementById('lastName').value,
+                email: document.getElementById('email').value,
+                phone: document.getElementById('phone').value
+            };
+
+            const contactId = document.getElementById('contactId').value;
+
+            try {
+                if(contactId){
+                    await api.updateContact(contactId, formData);
+                    showNotification('Contact updated successfully', 'success');
+                } else {
+                    await api.createContact(formData);
+                    showNotification('Contact created successfully', 'success');
+                }
+
+                closeModal();
+                loadContacts(currentSearch, currentPage);
+
+            } catch (error) {
+                // Error already handled in api methods
+            }
+        });
+
+        // Modal Close
+        document.querySelector('.close').addEventListener('click', closeModal);
+        document.getElementById('cancelBtn').addEventListener('click', closeModal);
+
+        window.addEventListener('click', (e) => {
+            const modal = document.getElementById('contactModal');
+            if(e.target === modal){
+                closeModal();
+            }
+        });
     };
 
-    // Reset form to initial state
-    function resetForm() {
-        contactForm.reset();
-        editIdInput.value = '';
-        isEditMode = false;
-        submitBtnText.textContent = 'Add Contact';
-        cancelBtn.style.display = 'none';
-        hideStatusMessage();
+    function escapeHTML(text) {
+        const map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;'
+        };
+
+        return text.replace(/[&<>"']/g, m => map[m]);
     };
 
-    // Event listeners
-    function setupEventListeners() {
-        contactForm.addEventListener('submit', handleFormSubmit);
-        cancelBtn.addEventListener('click', resetForm);
-    }
+    const openModal = (title) => {
+        document.getElementById('modalTitle').textContent = title;
+        document.getElementById('contactModal').style.display = 'block';
+    };
+
+    const closeModal = () => {
+        document.getElementById('contactModal').style.display = 'none';
+        document.getElementById('contactForm').reset();
+        document.getElementById('contactId').value = '';
+    };
 
     // Public Interface
     return {
@@ -365,11 +277,47 @@ const ContactManager = (() => {
             await loadContacts();
             setupEventListeners();
         },
-        refresh: loadContacts,
-        editContact: editContact,
-        deleteContact: deleteContact,
-    };
 
+        addContact: () => {
+            openModal('Add New Contact');
+        },
+
+        editContact: async (id) => {
+            try {
+                const result = await api.getById(id);
+
+                if (result && result.success){
+                    const contact = result.data;
+                    document.getElementById('contactId').value = contact.ContactID;
+                    document.getElementById('firstName').value = contact.FirstName;
+                    document.getElementById('lastName').value = contact.LastName;
+                    document.getElementById('email').value = contact.Email;
+                    document.getElementById('phone').value = contact.Phone || '';
+                    openModal('Edit Contact');
+                }
+
+            } catch (error) {
+                handleError(error, 'loading contact for edit');
+            }
+        },
+
+        deleteContact: async (id) => {
+            if (!confirm('Are you sure you want to delete this contact?')) {
+                return;
+            }
+
+            try {
+                await api.deleteContact(id);
+                showNotification('Contact deleted successfully', 'success');
+                loadContacts(currentSearch, currentPage);
+
+            } catch (error) {
+                // Error already handled in api method
+            }
+        },
+
+        refresh: () => loadContacts(currentSearch, currentPage)
+    };
 })();
 
 document.addEventListener('DOMContentLoaded', ContactManager.init);

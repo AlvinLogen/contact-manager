@@ -95,6 +95,30 @@ body {
 }
 
 /* ============================================
+   Search Content
+   ============================================ */
+.search-container {
+    display: flex;
+    gap: 10px;
+    margin: 20px 0;
+    align-items: center;
+}
+
+.search-input {
+    flex: 1;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
+}
+
+/* ============================================
    Main Content
    ============================================ */
 .main-content {
@@ -224,6 +248,98 @@ body {
 .btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+}
+
+/* ============================================
+   Pagination Content
+   ============================================ */
+
+.pagination-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+    padding: 15px 0;
+    border-top: 1px solid #ddd;
+}
+
+.pagination-info {
+    color: #666;
+    font-size: 14px;
+}
+
+.pagination-controls {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+#pageInfo {
+    color: #333;
+    font-weight: 500;
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+}
+
+.btn-secondary:hover:not(:disabled) {
+    background-color: #5a6268;
+}
+
+.btn-secondary:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+/* Notification styles */
+.notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    border-radius: 4px;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.fade-out {
+    animation: fadeOut 0.3s ease;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.notification-success {
+    background-color: #4CAF50;
+}
+
+.notification-error {
+    background-color: #f44336;
+}
+
+.notification-info {
+    background-color: #2196F3;
 }
 
 /* ============================================
